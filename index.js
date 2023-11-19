@@ -99,6 +99,12 @@ async function run() {
       console.log(result);
       res.send(result);
     });
+    app.get("/test", async (req, res) => {
+      const query = {};
+      const cursor = videoCollection.find(query);
+      const video = await cursor.toArray();
+      res.send(video);
+    });
 
     app.get("/videos", async (req, res) => {
       const query = {};
