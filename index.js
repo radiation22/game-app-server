@@ -77,6 +77,83 @@ async function run() {
       res.send(result);
     });
 
+    app.put("/addFollow", async (req, res) => {
+      try {
+        const userEmail = req.body.email;
+        const videoId = req.body.id;
+
+        // Assuming videoCollection is a MongoDB collection instance
+        const video = await videoCollection.findOne(
+          { _id: new ObjectId(videoId) },
+          { sort: { _id: 1 } } // Sort by _id in descending order (newest first)
+        );
+
+        if (video) {
+          // Check if userEmail is not already in the followers array
+          if (!video.followers.includes(userEmail)) {
+            // Add userEmail to the followers array
+            video.followers.push(userEmail);
+
+            // Update the document in the collection
+            await videoCollection.updateOne(
+              { _id: new ObjectId(videoId) },
+              { $set: { followers: video.followers } }
+            );
+
+            res.json({ success: true, message: "User added to followers" });
+          } else {
+            res.json({ success: false, message: "User is already a follower" });
+          }
+        } else {
+          res.json({ success: false, message: "Video not found" });
+        }
+      } catch (error) {
+        console.error(error);
+        res
+          .status(500)
+          .json({ success: false, message: "Internal server error" });
+      }
+    });
+
+    app.put("/addUnFollow", async (req, res) => {
+      try {
+        const userEmail = req.body.email;
+        const videoId = req.body.id;
+
+        // Assuming videoCollection is a MongoDB collection instance
+        const video = await videoCollection.findOne({
+          _id: new ObjectId(videoId),
+        });
+
+        if (video) {
+          // Check if userEmail is in the followers array
+          const indexOfUser = video.followers.indexOf(userEmail);
+
+          if (indexOfUser !== -1) {
+            // Remove userEmail from the followers array
+            video.followers.splice(indexOfUser, 1);
+
+            // Update the document in the collection
+            await videoCollection.updateOne(
+              { _id: new ObjectId(videoId) },
+              { $set: { followers: video.followers } }
+            );
+
+            res.json({ success: true, message: "User removed from followers" });
+          } else {
+            res.json({ success: false, message: "User is not a follower" });
+          }
+        } else {
+          res.json({ success: false, message: "Video not found" });
+        }
+      } catch (error) {
+        console.error(error);
+        res
+          .status(500)
+          .json({ success: false, message: "Internal server error" });
+      }
+    });
+
     app.post("/saveLikedVideos", async (req, res) => {
       const video = req.body;
       const result = await likeCollection.insertOne(video);
@@ -98,12 +175,6 @@ async function run() {
       const result = await ticketCollection.findOne(query);
       console.log(result);
       res.send(result);
-    });
-    app.get("/test", async (req, res) => {
-      const query = {};
-      const cursor = videoCollection.find(query);
-      const video = await cursor.toArray();
-      res.send(video);
     });
 
     app.get("/videos", async (req, res) => {
