@@ -33,6 +33,7 @@ async function run() {
     const likeCollection = client.db("GameDB").collection("liked");
     const orderCollection = client.db("GameDB").collection("order");
     const commentCollection = client.db("GameDB").collection("comment");
+    const followCollection = client.db("GameDB").collection("followers");
 
     io.on("connection", (socket) => {
       // Listen for incoming messages from a client
@@ -74,6 +75,13 @@ async function run() {
         updateDoc,
         options
       );
+      res.send(result);
+    });
+
+    app.post("/addFollow", async (req, res) => {
+      const video = req.body;
+      console.log(video);
+      const result = await followCollection.insertOne(video);
       res.send(result);
     });
 
