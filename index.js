@@ -80,7 +80,6 @@ async function run() {
 
     app.post("/addFollow", async (req, res) => {
       const video = req.body;
-      console.log(video);
       const result = await followCollection.insertOne(video);
       res.send(result);
     });
@@ -228,6 +227,13 @@ async function run() {
       const email = req.query.email;
       const query = { email: email };
       const cursor = videoCollection.find(query);
+      const orders = await cursor.toArray();
+      res.send(orders);
+    });
+    app.get("/myFollow", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const cursor = followCollection.find(query);
       const orders = await cursor.toArray();
       res.send(orders);
     });
