@@ -32,6 +32,8 @@ async function run() {
     const videoCollection = client.db("GameDB").collection("videos");
     const likeCollection = client.db("GameDB").collection("liked");
     const orderCollection = client.db("GameDB").collection("order");
+    const levelCollection = client.db("GameDB").collection("levels");
+    const productCollection = client.db("GameDB").collection("products");
     const commentCollection = client.db("GameDB").collection("comment");
     const followCollection = client.db("GameDB").collection("followers");
 
@@ -200,6 +202,16 @@ async function run() {
     app.post("/addVideo", async (req, res) => {
       const video = req.body;
       const result = await videoCollection.insertOne(video);
+      res.send(result);
+    });
+    app.post("/addLevel", async (req, res) => {
+      const video = req.body;
+      const result = await levelCollection.insertOne(video);
+      res.send(result);
+    });
+    app.post("/addProduct", async (req, res) => {
+      const video = req.body;
+      const result = await productCollection.insertOne(video);
       res.send(result);
     });
     app.post("/addComment", async (req, res) => {
