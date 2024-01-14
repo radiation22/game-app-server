@@ -250,14 +250,6 @@ async function run() {
       res.send(orders);
     });
 
-    app.post("/addClaim", async (req, res) => {
-      const claims = req.body;
-
-      const result = await claimCollection.insertOne(claims);
-
-      res.send(result);
-    });
-
     app.post("/addMessage", async (req, res) => {
       const review = req.body;
       const result = await messageCollection.insertOne(review);
@@ -298,45 +290,6 @@ async function run() {
       }
     });
 
-    // find ticket email query
-    app.get("/myTicket", async (req, res) => {
-      const email = req.query.email;
-      const query = { email: email };
-      const cursor = ticketCollection.find(query);
-      const ticket = await cursor.toArray();
-      res.send(ticket);
-    });
-    // find trip email query
-    app.get("/myTrip", async (req, res) => {
-      const email = req.query.email;
-      const query = { email: email };
-      const cursor = driverCollection.find(query);
-      const ticket = await cursor.toArray();
-      res.send(ticket);
-    });
-    // find ticket bus query
-    app.get("/busTicket", async (req, res) => {
-      const busNo = parseInt(req.query.busNo);
-
-      const query = { busNo: busNo };
-      const cursor = ticketCollection.find(query);
-      const ticket = await cursor.toArray();
-      res.send(ticket);
-    });
-
-    // get method for users with role query
-    app.get("/drivers", async (req, res) => {
-      const role = req.query.role;
-      const query = { role: role };
-      const users = await userCollection.find(query).toArray();
-      res.send(users);
-    });
-    // post for users method
-    app.post("/drivers", async (req, res) => {
-      const user = req.body;
-      const result = await userCollection.insertOne(user);
-      res.send(result);
-    });
     // post for wallet users method
     app.post("/addUsers", async (req, res) => {
       const user = req.body;
@@ -346,25 +299,6 @@ async function run() {
     app.post("/admin", async (req, res) => {
       const user = req.body;
       const result = await adminCollection.insertOne(user);
-      res.send(result);
-    });
-
-    app.put("/claim/:id", async (req, res) => {
-      const id = req.params.id;
-      const updateUser = req.body;
-
-      const filter = { _id: new ObjectId(id) };
-      const options = { upsert: true };
-      const updateDoc = {
-        $set: {
-          status: updateUser.status,
-        },
-      };
-      const result = await claimCollection.updateOne(
-        filter,
-        updateDoc,
-        options
-      );
       res.send(result);
     });
 
@@ -404,46 +338,6 @@ async function run() {
         options
       );
       res.send(result);
-    });
-
-    app.put("/incrementView", async (req, res) => {
-      const { videoId, email } = req.body;
-      console.log(email);
-      console.log(videoId);
-
-      try {
-        // Check if the video with the specified _id and user email exists
-        const video = await videoCollection.findOne({
-          _id: new ObjectId(videoId),
-          // email: email,
-        });
-
-        if (!video) {
-          return res.status(404).json({
-            error: "Video not found or user does not have permission",
-          });
-        }
-
-        // Increment the views count for the video
-        const result = await videoCollection.updateOne(
-          { _id: new ObjectId(videoId) },
-          { $inc: { views: 1 } }
-        );
-
-        if (result.modifiedCount === 0) {
-          return res
-            .status(500)
-            .json({ error: "Failed to update views count" });
-        }
-
-        res.json({
-          success: true,
-          message: "View count incremented successfully",
-        });
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Internal Server Error" });
-      }
     });
 
     app.put("/addComment", async (req, res) => {
