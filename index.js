@@ -198,6 +198,12 @@ async function run() {
       const video = await cursor.toArray();
       res.send(video);
     });
+    app.get("/allLevel", async (req, res) => {
+      const query = {};
+      const cursor = levelCollection.find(query);
+      const video = await cursor.toArray();
+      res.send(video);
+    });
     app.get("/comments", async (req, res) => {
       const query = {};
       const cursor = commentCollection.find(query);
